@@ -1,0 +1,1 @@
+# AlzPredict AI — app package

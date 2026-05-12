@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data (raw CSV — do not commit patient data)
+data/raw/*.csv
+data/raw/*.xlsx
+
+# Models (large binary files — use Git LFS or exclude)
+# Comment out the line below if you WANT to commit the model
+models/*.pkl
+
+# Reports (auto-generated — regenerate from pipeline)
+reports/figures/*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# MLflow (if added later)
+mlruns/
+mlartifacts/
