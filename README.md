@@ -405,9 +405,7 @@ See [`data/README.md`](data/README.md) for download instructions and full data d
 
 **If this project helped you, please ⭐ star the repo**
 
-[![GitHub](https://img.shields.io/badge/GitHub-YOUR__USERNAME-181717?style=for-the-badge&logo=github)](https://github.com/YOUR_USERNAME)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/YOUR_USERNAME)
-
+[![GitHub](https://img.shields.io/badge/GitHub-YOUR__USERNAME-181717?style=for-the-badge&logo=github)](https://github.com/nush1729)
 *⚠️ For research and educational purposes only. Not validated for clinical use.*
 
 </div>
