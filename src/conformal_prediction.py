@@ -50,8 +50,8 @@ def build_conformal(alpha: float = 0.10):
     if not check_mapie():
         return None, None
 
-    from mapie.classification import MapieClassifier
-    from mapie.metrics import classification_coverage_score
+    from mapie.classification import SplitConformalClassifier
+    from mapie.metrics.classification import classification_coverage_score
 
     model = joblib.load(MODEL_PATH)
     split = joblib.load(SPLIT_PATH)
@@ -69,15 +69,16 @@ def build_conformal(alpha: float = 0.10):
     print(f"[conformal] Calibration set: {X_cal.shape[0]} samples")
     print(f"[conformal] Test set:        {X_test.shape[0]} samples")
 
-    # Fit conformal wrapper (cv="prefit" = use existing model weights)
-    mapie = MapieClassifier(estimator=model, method="lac", cv="prefit")
-    mapie.fit(X_cal, y_cal)
+    # Fit conformal wrapper with the desired confidence_level
+    mapie = SplitConformalClassifier(estimator=model, conformity_score="lac", confidence_level=1-alpha, prefit=True)
+    mapie.conformalize(X_cal, y_cal)
 
     # Predict with coverage guarantee
-    y_pred, y_sets = mapie.predict(X_test, alpha=alpha)
+    y_pred, y_sets = mapie.predict_set(X_test)
+    y_sets = y_sets[:, :, 0] # Extract matching alpha dimension
 
     # Measure actual coverage
-    coverage = classification_coverage_score(y_test, y_sets)
+    coverage = float(classification_coverage_score(y_test, y_sets).item())
     avg_set_size = y_sets.sum(axis=1).mean()
 
     print(f"\n[conformal] Results (α={alpha}, target coverage={(1-alpha)*100:.0f}%):")
@@ -215,7 +216,8 @@ def predict_with_uncertainty(model_or_mapie, patient_df, top_features, alpha=0.1
         mapie = model_or_mapie
 
     X = patient_df[top_features]
-    y_pred, y_sets = mapie.predict(X, alpha=alpha)
+    y_pred, y_sets = mapie.predict_set(X)
+    y_sets = y_sets[:, :, 0] # Extract matching alpha dimension
     pset = [CLASS_NAMES[j] for j in range(3) if y_sets[0, j]]
     return int(y_pred[0]), y_sets[0], pset
 

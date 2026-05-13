@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🧠 AlzPredict AI — Explainable Alzheimer's Prediction System
 
 <div align="center">
@@ -10,11 +11,13 @@
 
 <br/>
 
-[![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org)
-[![NextJS](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
-[![Three.js](https://img.shields.io/badge/Three.js-3D-white?style=for-the-badge&logo=threedotjs&logoColor=black)](https://threejs.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.x-FF6600?style=for-the-badge)](https://xgboost.readthedocs.io)
+[![SHAP](https://img.shields.io/badge/SHAP-Explainable_AI-00C7B7?style=for-the-badge)](https://shap.readthedocs.io)
+[![Optuna](https://img.shields.io/badge/Optuna-Bayesian_Tuning-2980B9?style=for-the-badge)](https://optuna.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Colab](https://img.shields.io/badge/Notebook-Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com)
+[![License](https://img.shields.io/badge/License-MIT-27AE60?style=for-the-badge)](LICENSE)
 
 <br/>
 
@@ -174,19 +177,12 @@ pip install -r requirements.txt
 
 # 4. Download dataset → place in data/raw/oasis_longitudinal.csv
 
-# 5. Run full pipeline to train model artifacts
+# 5. Run full pipeline
 python run_pipeline.py
 
-# 6. Launch Backend API (Terminal 1)
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-
-# 7. Launch Next.js Production FrontEnd (Terminal 2)
-cd alzpredict-web
-npm install
-npm run dev
+# 6. Launch dashboard
+streamlit run app/streamlit_app.py
 ```
-
-Visit `http://localhost:3000` to launch the 3D ecosystem!
 
 ---
 
@@ -411,3 +407,41 @@ See [`data/README.md`](data/README.md) for download instructions and full data d
 **If this project helped you, please ⭐ star the repo**
 
 </div>
+=======
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+>>>>>>> 6ad074d (ML Fixes)
