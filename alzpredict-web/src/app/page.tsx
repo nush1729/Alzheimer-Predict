@@ -33,52 +33,52 @@ export default function Home() {
     <div className="flex flex-col items-center w-full">
       
       {/* Hero Section */}
-      <section className="relative w-full min-h-[85vh] flex items-center px-8 lg:px-20 overflow-hidden border-b border-white/5">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full z-10 max-w-7xl mx-auto">
+      <section className="relative w-full min-h-[85vh] flex items-center py-12 md:py-20 border-b border-white/5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center w-full z-10 max-w-7xl mx-auto px-6 md:px-12">
           
           <motion.div 
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col space-y-8"
+            className="flex flex-col space-y-8 order-2 lg:order-1"
           >
-            <motion.div variants={itemVariants} className="flex items-center space-x-3 px-4 py-2 w-fit bg-brand-blue/10 border border-brand-blue/20 rounded-full">
-              <div className="w-2 h-2 bg-brand-cyan rounded-full animate-pulse" />
-              <span className="text-xs font-bold text-brand-cyan tracking-widest uppercase">System Status: Operational</span>
+            <motion.div variants={itemVariants} className="flex items-center space-x-3 px-4 py-2 w-fit bg-brand-cyan/10 border border-brand-cyan/20 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+              <div className="w-2 h-2 bg-brand-cyan rounded-full animate-pulse shadow-[0_0_8px_#10B981]" />
+              <span className="text-xs font-black text-brand-cyan tracking-widest uppercase">System Status: Operational</span>
             </motion.div>
 
-            <motion.h1 variants={itemVariants} className="text-5xl lg:text-7xl font-display font-black tracking-tight leading-[1.1]">
+            <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl xl:text-7xl font-display font-black tracking-tight leading-[1.1] text-white">
               Mapping the <br />
-              <span className="bg-gradient-to-r from-brand-cyan via-brand-blue to-brand-purple bg-clip-text text-transparent bg-300% animate-glow-pulse">
+              <span className="bg-gradient-to-r from-brand-cyan via-brand-blue to-brand-purple bg-clip-text text-transparent bg-300% animate-glow-pulse select-none">
                 Human Brain
               </span>
             </motion.h1>
             
-            <motion.p variants={itemVariants} className="text-lg text-slate-400 max-w-lg font-light leading-relaxed">
+            <motion.p variants={itemVariants} className="text-lg text-slate-400 max-w-lg font-medium leading-relaxed">
               Next-generation Enterprise AI solution for pre-emptive Alzheimer&apos;s detection. Powered by non-linear gradient boosting and localized SHAP geometry.
             </motion.p>
 
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-4">
-              <Link href="/diagnostic" className="flex items-center gap-2 px-8 py-4 bg-brand-cyan text-black font-bold rounded-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(0,245,255,0.3)]">
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 pt-4">
+              <Link href="/diagnostic" className="flex items-center gap-2 px-8 py-4 bg-brand-cyan text-black font-black rounded-2xl hover:scale-[1.03] hover:bg-emerald-400 transition-all duration-300 shadow-[0_0_35px_rgba(16,185,129,0.3)] select-none uppercase tracking-wider text-sm">
                 Launch Diagnostics <ArrowRight size={18} />
               </Link>
-              <Link href="/explain" className="glass-panel flex items-center gap-2 px-8 py-4 text-white font-medium rounded-xl glass-panel-hover border border-white/10 hover:border-white/20">
+              <Link href="/explain" className="glass-panel flex items-center gap-2 px-8 py-4 text-slate-200 font-black text-sm tracking-wider uppercase rounded-2xl hover:bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 select-none">
                 Explore the Engine
               </Link>
             </motion.div>
           </motion.div>
 
           {/* 3D Wrapper */}
-          <div className="relative w-full h-[500px] lg:h-[600px]">
+          <div className="relative w-full h-[450px] md:h-[550px] lg:h-[650px] order-1 lg:order-2 select-none">
             <ThreeBrain />
             {/* Floating Data Point overlays for UX decoration */}
-            <div className="absolute top-1/4 right-10 glass-panel p-4 rounded-xl border border-brand-cyan/20 animate-float">
-              <div className="flex items-center gap-2 text-xs text-brand-cyan uppercase font-bold"><Activity size={14} /> Accuracy</div>
-              <div className="text-2xl font-display font-bold mt-1">93.8%</div>
+            <div className="absolute top-1/4 right-4 md:right-10 glass-panel px-6 py-4 rounded-2xl border border-brand-cyan/20 animate-float backdrop-blur-md shadow-2xl">
+              <div className="flex items-center gap-2 text-[10px] text-brand-cyan uppercase font-black tracking-widest"><Activity size={14} /> Accuracy</div>
+              <div className="text-3xl font-display font-black mt-1 text-white">93.8%</div>
             </div>
-            <div className="absolute bottom-1/4 left-0 glass-panel p-4 rounded-xl border border-brand-purple/20 animate-float" style={{animationDelay: '2.5s'}}>
-              <div className="flex items-center gap-2 text-xs text-brand-purple uppercase font-bold"><Brain size={14} /> AUC-ROC</div>
-              <div className="text-2xl font-display font-bold mt-1">0.991</div>
+            <div className="absolute bottom-1/4 left-4 md:left-0 glass-panel px-6 py-4 rounded-2xl border border-brand-purple/20 animate-float backdrop-blur-md shadow-2xl" style={{animationDelay: '2.5s'}}>
+              <div className="flex items-center gap-2 text-[10px] text-brand-purple uppercase font-black tracking-widest"><Brain size={14} /> AUC-ROC</div>
+              <div className="text-3xl font-display font-black mt-1 text-white">0.991</div>
             </div>
           </div>
         </div>

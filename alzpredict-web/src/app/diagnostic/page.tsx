@@ -8,8 +8,9 @@ import dynamic from "next/dynamic";
 
 const API_URL = "http://localhost:8000";
 
-// Dynamically import ThreeAtom to prevent SSR issues
+// Dynamically import Three-Fiber components to prevent SSR issues
 const ThreeAtom = dynamic(() => import("@/components/ThreeAtom"), { ssr: false });
+const ThreeDoctor = dynamic(() => import("@/components/ThreeDoctor"), { ssr: false });
 
 function DistributionCurve({ min, max, val }: { min: number; max: number; val: number }) {
   const points = [];
@@ -257,22 +258,34 @@ export default function DiagnosticWorkspace() {
             </motion.div>
           )}
 
-          {/* STEP 2: RESULTS */}
+          {/* STEP 2: RESULTS WIDESCREEN MATRIX */}
           {currentStep === 2 && (
             <motion.div
               key="step2"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 py-4"
+              className="w-full max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 py-4 items-stretch"
             >
               {!result ? (
-                <div className="col-span-2 h-96 glass-panel rounded-3xl border border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 gap-4">
+                <div className="xl:col-span-12 h-96 glass-panel rounded-3xl border border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 gap-4 bg-black/10">
                   <Activity size={64} className="opacity-20" />
-                  <span className="text-base uppercase font-black tracking-widest">Empty Buffer</span>
+                  <span className="text-base uppercase font-black tracking-widest">Empty Analytical Buffer</span>
                 </div>
               ) : (
                 <>
-                  <div className="glass-panel p-10 rounded-3xl relative overflow-hidden flex flex-col justify-between border-t-8 border-brand-cyan bg-black/30 shadow-2xl">
+                  {/* COLUMN 1: Holographic 3D Doctor Scanning Visualizer */}
+                  <div className="xl:col-span-4 h-[420px] xl:h-auto glass-panel rounded-3xl relative overflow-hidden border border-white/5 bg-black/25 shadow-2xl flex flex-col justify-center items-center p-2">
+                    <ThreeDoctor 
+                      severity={result.clinical_assessment.severity} 
+                      riskTier={result.clinical_assessment.risk_tier} 
+                    />
+                  </div>
+
+                  {/* COLUMN 2: Clinical Certification Assessment */}
+                  <div className={`xl:col-span-4 glass-panel p-10 rounded-3xl relative overflow-hidden flex flex-col justify-between bg-black/30 shadow-2xl border-t-8 border-x border-b border-x-white/5 border-b-white/5 ${
+                    result.clinical_assessment.severity === 'critical' || result.clinical_assessment.severity === 'high'
+                      ? "border-t-red-500" : result.clinical_assessment.severity === 'moderate' ? "border-t-amber-500" : "border-t-brand-cyan"
+                  }`}>
                     <div className="relative z-10">
                       <div className="flex justify-between items-center mb-8">
                         <span className="text-xs font-black tracking-widest uppercase px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-300 flex items-center gap-2.5">
@@ -283,15 +296,17 @@ export default function DiagnosticWorkspace() {
                       </div>
 
                       <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Diagnostic Status</h3>
-                      <h1 className={`text-5xl lg:text-6xl font-display font-black tracking-tighter mt-3 ${
+                      <h1 className={`text-5xl font-display font-black tracking-tighter mt-3 ${
                         result.clinical_assessment.severity === 'critical' || result.clinical_assessment.severity === 'high'
                           ? "text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-                          : "text-brand-cyan drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                          : result.clinical_assessment.severity === 'moderate'
+                            ? "text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                            : "text-brand-cyan drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]"
                       }`}>
                         {result.clinical_assessment.risk_tier}
                       </h1>
                       
-                      <div className="mt-10 bg-black/40 border border-white/5 p-8 rounded-2xl shadow-inner">
+                      <div className="mt-8 bg-black/40 border border-white/5 p-8 rounded-2xl shadow-inner">
                         <h4 className="text-xs font-black tracking-widest uppercase text-slate-500 mb-3">Required Protocol</h4>
                         <p className="text-base text-slate-200 italic leading-relaxed font-medium">&ldquo;{result.clinical_assessment.recommended_action}&rdquo;</p>
                       </div>
@@ -299,17 +314,18 @@ export default function DiagnosticWorkspace() {
 
                     <button 
                       onClick={() => window.location.href = '/explain'}
-                      className="mt-10 w-full py-5 rounded-2xl font-black text-base bg-white text-black flex items-center justify-center gap-3 hover:bg-slate-200 active:scale-[0.98] transition-all uppercase tracking-wider shadow-xl"
+                      className="mt-8 w-full py-5 rounded-2xl font-black text-base bg-white text-black flex items-center justify-center gap-3 hover:bg-slate-200 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-wider shadow-xl"
                     >
                       Explore Interpretability <ArrowRight size={20}/>
                     </button>
                   </div>
 
-                  <div className="glass-panel p-10 rounded-3xl relative border border-white/5 flex flex-col justify-between bg-black/30 shadow-2xl">
+                  {/* COLUMN 3: Probability Densities Vector */}
+                  <div className="xl:col-span-4 glass-panel p-10 rounded-3xl relative border border-white/5 flex flex-col justify-between bg-black/30 shadow-2xl">
                     <div>
-                      <h3 className="text-lg font-black text-slate-200 flex items-center gap-3 mb-10"><CheckCircle2 size={22} className="text-brand-cyan" /> Probability Densities</h3>
+                      <h3 className="text-lg font-black text-slate-200 flex items-center gap-3 mb-8"><CheckCircle2 size={22} className="text-brand-cyan" /> Probability Densities</h3>
                       
-                      <div className="space-y-8">
+                      <div className="space-y-6">
                         {Object.entries(result.probabilities).map(([label, val]: any) => {
                           const pct = (val * 100).toFixed(1);
                           return (
@@ -322,7 +338,7 @@ export default function DiagnosticWorkspace() {
                                 <motion.div 
                                   initial={{ width: 0 }}
                                   animate={{ width: `${pct}%` }}
-                                  transition={{ duration: 1, ease: "easeOut" }}
+                                  transition={{ duration: 1.2, ease: "easeOut" }}
                                   className={`h-full rounded-full ${
                                     label === 'Normal' ? 'bg-gradient-to-r from-emerald-600 to-brand-cyan' :
                                     label === 'Converted' ? 'bg-gradient-to-r from-indigo-600 to-brand-blue' :
@@ -336,7 +352,7 @@ export default function DiagnosticWorkspace() {
                       </div>
                     </div>
 
-                    <div className="mt-10 p-6 rounded-2xl border border-dashed border-white/10 text-xs text-slate-400 leading-relaxed flex flex-col gap-3 bg-black/20">
+                    <div className="mt-8 p-6 rounded-2xl border border-dashed border-white/10 text-xs text-slate-400 leading-relaxed flex flex-col gap-3 bg-black/20">
                       <div className="flex items-center gap-2 font-black text-slate-300 uppercase tracking-widest"><Activity size={14}/> Statistical Bounds</div>
                       This pipeline utilizes Bayesian optimized gradient boosting. Conformal calibration certifies frequentist bounds covering ground truth predictions &ge; 90.0%.
                     </div>
