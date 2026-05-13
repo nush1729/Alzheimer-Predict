@@ -154,3 +154,152 @@ def explain(payload: PatientData):
         
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+class PdpPayload(BaseModel):
+    feature_x: str
+    feature_y: str
+    base_data: Dict[str, float]
+
+@app.post("/api/pdp")
+def partial_dependence(payload: PdpPayload):
+    if not MODELS_LOADED:
+        raise HTTPException(status_code=503, detail="Model not ready")
+        
+    fx = payload.feature_x
+    fy = payload.feature_y
+    
+    meta = get_metadata()["feature_config"]
+    if fx not in meta or fy not in meta:
+        raise HTTPException(status_code=400, detail="Invalid feature specified")
+        
+    # Define 15x15 grid
+    grid_size = 15
+    x_vals = np.linspace(meta[fx]["min"], meta[fx]["max"], grid_size)
+    y_vals = np.linspace(meta[fy]["min"], meta[fy]["max"], grid_size)
+    
+    base_vector = {}
+    for f in top_features:
+        base_vector[f] = payload.base_data.get(f, meta.get(f, {}).get("default", 0.0))
+        
+    results = []
+    # Build meshgrid evaluations in one fast batch
+    eval_dicts = []
+    coords = []
+    for xv in x_vals:
+        for yv in y_vals:
+            vec = base_vector.copy()
+            vec[fx] = float(xv)
+            vec[fy] = float(yv)
+            eval_dicts.append(vec)
+            coords.append((float(xv), float(yv)))
+            
+    eval_df = pd.DataFrame(eval_dicts)[top_features]
+    probas = model.predict_proba(eval_df)
+    # Probability of Demented + Converted
+    risk_scores = probas[:, 1] * 0.6 + probas[:, 2] * 0.4
+    
+    for i, score in enumerate(risk_scores):
+        results.append({
+            "x": coords[i][0],
+            "y": coords[i][1],
+            "risk": float(score)
+        })
+        
+    return {
+        "feature_x": fx,
+        "feature_y": fy,
+        "grid": results
+    }
+
+@app.post("/api/counterfactual")
+def compute_recourse(payload: PatientData):
+    if not MODELS_LOADED:
+        raise HTTPException(status_code=503, detail="Model not ready")
+        
+    meta = get_metadata()["feature_config"]
+    
+    # Determine baseline
+    base_vec = {}
+    for f in top_features:
+        base_vec[f] = payload.data.get(f, meta[f]["default"])
+        
+    def get_risk(v):
+        df = pd.DataFrame([v])[top_features]
+        p = model.predict_proba(df)[0]
+        return p[1] * 0.6 + p[2] * 0.4
+        
+    base_risk = get_risk(base_vec)
+    
+    # If already low risk, return zero recourse
+    if base_risk < 0.25:
+        return {
+            "recourse_found": True,
+            "message": "Patient maintains standard cognitive profiles; no immediate mathematical intervention needed.",
+            "changes": []
+        }
+        
+    # Identify top features that can actually move (exclude Age, Sex for recourse analysis)
+    actionable_features = ["MMSE", "CDR", "nWBV", "SES", "EDUC"]
+    valid_actions = [f for f in actionable_features if f in top_features]
+    
+    # We seek top 2 most productive movements
+    best_change = None
+    min_dist = float('inf')
+    
+    for feat in valid_actions:
+        cfg = meta[feat]
+        # Check movement towards optimum
+        # Try optimal value (e.g., max MMSE, min CDR, max nWBV, min SES, max EDUC)
+        opt_val = cfg["max"] if feat in ["MMSE", "nWBV", "EDUC"] else cfg["min"]
+        
+        # Create modified vector
+        mod = base_vec.copy()
+        mod[feat] = opt_val
+        
+        new_risk = get_risk(mod)
+        if new_risk < 0.25:
+            # Recourse found!
+            dist = abs(opt_val - base_vec[feat]) / (cfg["max"] - cfg["min"])
+            if dist < min_dist:
+                min_dist = dist
+                best_change = [{
+                    "feature": feat,
+                    "original": float(base_vec[feat]),
+                    "target": float(opt_val),
+                    "description": f"Improve {feat} to {opt_val}"
+                }]
+                
+    # If no single feature recourse, try combinations
+    if not best_change:
+        for i, f1 in enumerate(valid_actions):
+            for f2 in valid_actions[i+1:]:
+                cfg1, cfg2 = meta[f1], meta[f2]
+                opt1 = cfg1["max"] if f1 in ["MMSE", "nWBV", "EDUC"] else cfg1["min"]
+                opt2 = cfg2["max"] if f2 in ["MMSE", "nWBV", "EDUC"] else cfg2["min"]
+                
+                mod = base_vec.copy()
+                mod[f1] = opt1
+                mod[f2] = opt2
+                
+                new_risk = get_risk(mod)
+                if new_risk < 0.25:
+                    best_change = [
+                        {"feature": f1, "original": float(base_vec[f1]), "target": float(opt1), "description": f"Normalize {f1}"},
+                        {"feature": f2, "original": float(base_vec[f2]), "target": float(opt2), "description": f"Improve {f2}"}
+                    ]
+                    break
+            if best_change: break
+            
+    if best_change:
+        return {
+            "recourse_found": True,
+            "changes": best_change,
+            "message": "Algorithmic recourse identified. Adjusting the phenotypes below yields a stable, low-risk classification."
+        }
+    else:
+        return {
+            "recourse_found": False,
+            "changes": [],
+            "message": "System density prevents 2-factor mathematical toggle. Multiple biometric adjustments necessary."
+        }
+

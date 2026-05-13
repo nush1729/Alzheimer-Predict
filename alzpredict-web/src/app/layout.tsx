@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import ClientProvider from "@/components/ClientProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
             <Link href="/diagnostic" className="text-slate-300 hover:text-brand-cyan transition-colors">Diagnostic Suite</Link>
             <Link href="/explain" className="text-slate-300 hover:text-brand-cyan transition-colors">Explainability</Link>
             <Link href="/analytics" className="text-slate-300 hover:text-brand-cyan transition-colors">System Audit</Link>
+            <Link href="/science" className="text-slate-300 hover:text-brand-cyan transition-colors">Science</Link>
           </div>
 
           <Link href="/diagnostic" className="px-5 py-2 bg-brand-cyan/10 border border-brand-cyan/30 text-brand-cyan rounded-full text-xs font-bold tracking-wider hover:bg-brand-cyan hover:text-black transition-all duration-300 uppercase">
@@ -48,10 +50,12 @@ export default function RootLayout({
           </Link>
         </nav>
 
-        {/* Core Content Container */}
-        <main className="pt-16 min-h-screen relative overflow-hidden">
-          {children}
-        </main>
+        <ClientProvider>
+          {/* Core Content Container */}
+          <main className="pt-16 min-h-screen relative overflow-hidden">
+            {children}
+          </main>
+        </ClientProvider>
         
         {/* Background glowing orbs */}
         <div className="fixed top-1/4 -left-20 w-96 h-96 bg-brand-cyan/10 rounded-full filter blur-[100px] opacity-50 pointer-events-none -z-10 animate-glow-pulse"></div>

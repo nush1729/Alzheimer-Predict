@@ -43,11 +43,7 @@ html, body {
 
 body {
   min-height: 100vh;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(0, 245, 255, 0.05) 0%, transparent 25%),
-    radial-gradient(circle at 85% 85%, rgba(191, 90, 242, 0.05) 0%, transparent 25%),
-    radial-gradient(circle at 50% 50%, rgba(10, 132, 255, 0.03) 0%, transparent 50%);
-  background-attachment: fixed;
+  background: transparent;
 }
 
 /* Deep glass utility custom classes */
