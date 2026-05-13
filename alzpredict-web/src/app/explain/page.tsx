@@ -4,9 +4,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from "recharts";
-import { Loader2, Search, Network, GitBranch, Compass, Info, ArrowRight, RefreshCcw, ChevronsRight } from "lucide-react";
+import { Loader2, Search, Network, GitBranch, Compass, Info, ArrowRight, RefreshCcw, ChevronsRight, Fingerprint, CheckCircle2 } from "lucide-react";
+import dynamic from "next/dynamic";
 
 const API_URL = "http://localhost:8000";
+
+// Load 3D element
+const ThreeAtom = dynamic(() => import("@/components/ThreeAtom"), { ssr: false });
 
 export default function ExplainLab() {
   const [activeTab, setActiveTab] = useState<"shap" | "recourse" | "pdp">("shap");
@@ -15,11 +19,9 @@ export default function ExplainLab() {
   const [shapData, setShapData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   
-  // Recourse states
   const [recourse, setRecourse] = useState<any>(null);
   const [recourseLoading, setRecourseLoading] = useState(false);
 
-  // PDP States
   const [pdpData, setPdpData] = useState<any>(null);
   const [pdpLoading, setPdpLoading] = useState(false);
   const [pdpX, setPdpX] = useState("MMSE");
@@ -72,7 +74,6 @@ export default function ExplainLab() {
     setPdpLoading(false);
   };
 
-  // Load shap & recourse on mount once inputs exist
   useEffect(() => {
     if (Object.keys(inputs).length > 0) {
       fetchShap();
@@ -82,7 +83,6 @@ export default function ExplainLab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputs]);
 
-  // Refetch PDP if features change
   useEffect(() => {
     if (Object.keys(inputs).length > 0) {
       fetchPdp();
@@ -92,66 +92,76 @@ export default function ExplainLab() {
 
   if (!config) {
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center z-10 relative">
-        <Loader2 className="animate-spin text-brand-purple" size={44} />
-        <p className="text-slate-400 font-display text-xs tracking-widest uppercase mt-4">Establishing Explainability Framework...</p>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-6">
+        <Loader2 className="animate-spin text-brand-purple w-12 h-12" />
+        <p className="text-slate-400 font-display tracking-widest text-sm uppercase font-bold">Initializing Interpretation Matrix...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8 relative z-10">
+    <div className="w-full py-10 flex flex-col items-center">
       
-      <header className="mb-10 text-center md:text-left">
-        <h1 className="text-4xl font-display font-black tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-          Explainability Laboratory
+      <header className="mb-16 text-center w-full max-w-4xl">
+        <div className="flex items-center justify-center gap-3 mb-4 text-brand-purple">
+          <Fingerprint size={28} />
+          <span className="text-xs tracking-widest uppercase font-black bg-white/5 border border-white/10 px-4 py-2 rounded-full">Interpretable Intelligence</span>
+        </div>
+        <h1 className="text-5xl lg:text-7xl font-display font-black tracking-tight bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-transparent">
+          Interpretation Suite
         </h1>
-        <p className="text-slate-400 mt-1 text-sm">Deconstruct high-dimensional ML manifolds into clinical, human-auditable mechanics.</p>
+        <p className="text-slate-400 mt-4 text-lg max-w-2xl mx-auto leading-relaxed">
+          Deconstruct multi-dimensional model manifolds into human-verifiable clinical rationales.
+        </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch w-full max-w-7xl">
         
-        {/* Left: Active Config Panel */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="glass-panel p-6 rounded-2xl relative border border-white/5">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-purple to-transparent" />
-            <h3 className="font-display font-bold flex items-center gap-2 text-slate-200 mb-6">
-              <Search size={16} className="text-brand-purple" /> Evaluated Phenotype
+        {/* Left: Sticky Feature Panel */}
+        <div className="lg:col-span-4 flex flex-col gap-6 h-full">
+          <div className="glass-panel p-8 rounded-3xl border border-white/5 flex flex-col h-full bg-black/20">
+            <div className="h-32 rounded-2xl overflow-hidden border border-white/5 mb-6 bg-black/20 flex items-center justify-center">
+              <ThreeAtom />
+            </div>
+
+            <h3 className="font-display font-black text-xl flex items-center gap-3 text-slate-100 mb-6">
+              <Search size={20} className="text-brand-purple" /> Local Vector
             </h3>
-            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+
+            <div className="space-y-3 flex-1 max-h-[450px] overflow-y-auto pr-3 custom-scrollbar">
               {config.features.map((f: string) => (
-                <div key={f} className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5 rounded-xl group hover:bg-white/5 transition-all duration-300">
-                  <span className="text-xs font-bold text-slate-400 group-hover:text-slate-200 transition-colors">{config.feature_config[f]?.label.split('(')[0]}</span>
-                  <span className="text-xs font-mono font-black text-brand-cyan">{inputs[f]?.toFixed(config.feature_config[f]?.step < 1 ? 2 : 0)}</span>
+                <div key={f} className="flex justify-between items-center p-4 bg-white/[0.02] border border-white/5 rounded-2xl group hover:bg-brand-purple/5 transition-all">
+                  <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{config.feature_config[f]?.label.split('(')[0]}</span>
+                  <span className="text-base font-mono font-black text-brand-cyan bg-black/40 px-3 py-1 rounded-lg border border-white/5 group-hover:border-brand-cyan/20">{inputs[f]?.toFixed(config.feature_config[f]?.step < 1 ? 2 : 0)}</span>
                 </div>
               ))}
             </div>
+
             <button 
               onClick={() => window.location.href = '/diagnostic'}
-              className="mt-6 w-full py-3.5 rounded-xl text-xs font-black tracking-widest uppercase bg-brand-purple/10 border border-brand-purple/30 text-brand-purple hover:bg-brand-purple hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+              className="mt-8 w-full py-5 rounded-2xl text-sm font-black tracking-widest uppercase bg-brand-purple/10 border border-brand-purple/30 text-brand-purple hover:bg-brand-purple hover:text-white transition-all flex items-center justify-center gap-3 shadow-lg"
             >
-              Reconfigure Biosignature <RefreshCcw size={13}/>
+              Reconfigure Signature <RefreshCcw size={16}/>
             </button>
           </div>
         </div>
 
-        {/* Right: Interactive Multi-Tab Analysis Suite */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
+        {/* Right: Analytics Center */}
+        <div className="lg:col-span-8 flex flex-col gap-6 h-full">
           
-          {/* Nav Tabs */}
-          <div className="flex gap-2 glass-panel p-1.5 rounded-xl border border-white/5 bg-black/20 self-start">
+          <div className="flex gap-3 glass-panel p-2 rounded-2xl border border-white/5 bg-black/30 self-start w-full sm:w-auto overflow-x-auto">
             {[
-              { id: "shap", label: "SHAP Vectors", icon: <Network size={14}/> },
-              { id: "recourse", label: "Counterfactual Recourse", icon: <GitBranch size={14}/> },
-              { id: "pdp", label: "Interaction Mesh (PDP)", icon: <Compass size={14}/> }
+              { id: "shap", label: "SHAP Matrix", icon: <Network size={16}/> },
+              { id: "recourse", label: "Algorithmic Recourse", icon: <GitBranch size={16}/> },
+              { id: "pdp", label: "Topography (PDP)", icon: <Compass size={16}/> }
             ].map((t) => (
               <button
                 key={t.id}
                 onClick={() => setActiveTab(t.id as any)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+                className={`flex items-center gap-3 px-6 py-3.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                   activeTab === t.id 
-                    ? "bg-white/10 text-white border border-white/5 shadow-inner" 
-                    : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.02]"
+                    ? "bg-brand-purple text-white shadow-[0_0_25px_rgba(139,92,246,0.3)] border border-brand-purple/40" 
+                    : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
                 }`}
               >
                 {t.icon} {t.label}
@@ -159,48 +169,46 @@ export default function ExplainLab() {
             ))}
           </div>
 
-          {/* Dynamic Workspace Port */}
-          <div className="glass-panel p-8 rounded-2xl flex-1 min-h-[450px] relative border border-white/5 flex flex-col overflow-hidden">
-            
+          <div className="glass-panel p-10 rounded-3xl flex-1 min-h-[500px] flex flex-col relative border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
             <AnimatePresence mode="wait">
               
-              {/* SHAP VIEW */}
+              {/* Tab 1: SHAP */}
               {activeTab === "shap" && (
                 <motion.div
                   key="shap"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  exit={{ opacity: 0, y: -15 }}
                   className="h-full flex flex-col flex-1"
                 >
-                  <div className="flex justify-between items-start mb-8">
+                  <div className="flex justify-between items-start mb-10 gap-4">
                     <div>
-                      <h3 className="text-lg font-display font-bold text-white">TreeSHAP Local Topology</h3>
-                      <p className="text-xs text-slate-500 tracking-wide font-bold mt-0.5 uppercase">Attribution geometry relative to Expected Base Value</p>
+                      <h3 className="text-2xl font-display font-black text-white tracking-tight">SHAP Gradient Topology</h3>
+                      <p className="text-xs text-slate-500 tracking-widest font-black mt-1 uppercase">Contribution attributions relative to statistical base rate</p>
                     </div>
-                    <div className="hidden md:flex items-center gap-4 text-[10px] uppercase font-black tracking-wider">
-                      <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded bg-red-500 opacity-80" /> Accelerates Risk</div>
-                      <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded bg-brand-blue opacity-80" /> Dampens Risk</div>
+                    <div className="hidden md:flex items-center gap-5 text-xs uppercase font-black tracking-wider shrink-0">
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-red-500 opacity-85" /> Promotes Risk</div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-brand-blue opacity-85" /> Inhibits Risk</div>
                     </div>
                   </div>
 
                   {loading ? (
-                    <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-brand-purple" size={32}/></div>
+                    <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-brand-purple w-10 h-10"/></div>
                   ) : shapData.length > 0 ? (
-                    <div className="flex-1 min-h-[320px] w-full relative z-10">
+                    <div className="flex-1 min-h-[350px] w-full relative z-10 bg-black/10 p-4 rounded-2xl border border-white/5">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={shapData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <BarChart data={shapData} layout="vertical" margin={{ top: 10, right: 40, left: 25, bottom: 10 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" horizontal={false} />
-                          <XAxis type="number" stroke="rgba(255,255,255,0.3)" fontSize={10} tickFormatter={(v) => v.toFixed(2)} />
-                          <YAxis dataKey="feature" type="category" stroke="rgba(255,255,255,0.6)" fontSize={10} fontWeight="bold" width={65} axisLine={false} />
+                          <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={11} tickFormatter={(v) => v.toFixed(2)} fontWeight="bold" />
+                          <YAxis dataKey="feature" type="category" stroke="rgba(255,255,255,0.7)" fontSize={11} fontWeight="black" width={75} axisLine={false} />
                           <Tooltip
                             cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', fontSize: '11px' }}
+                            contentStyle={{ backgroundColor: '#09090d', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', fontSize: '12px', color: '#fff' }}
                           />
-                          <ReferenceLine x={0} stroke="rgba(255,255,255,0.2)" strokeWidth={1} />
-                          <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16}>
+                          <ReferenceLine x={0} stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} />
+                          <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={22}>
                             {shapData.map((entry, idx) => (
-                              <Cell key={`cell-${idx}`} fill={entry.value > 0 ? "#ef4444" : "#0A84FF"} opacity={0.8} />
+                              <Cell key={`cell-${idx}`} fill={entry.value > 0 ? "#ef4444" : "#6366F1"} opacity={0.9} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -208,62 +216,63 @@ export default function ExplainLab() {
                     </div>
                   ) : null}
                   
-                  <div className="mt-6 p-4 bg-white/[0.02] border border-white/5 rounded-xl text-[11px] text-slate-400 leading-relaxed flex gap-3">
-                    <Info size={14} className="text-brand-purple shrink-0 pt-0.5" />
-                    <span>Values represents localized impact vector forcing the classification boundary. Sum of feature attributions exactly equals output logit minus expected mean base value.</span>
+                  <div className="mt-8 p-6 bg-black/30 border border-white/5 rounded-2xl text-xs text-slate-400 leading-relaxed flex gap-4">
+                    <Info size={18} className="text-brand-purple shrink-0 pt-0.5" />
+                    <span>Values reflect game-theoretic feature weight gradients shifting output logits from base rates. Total aggregation matches cumulative prediction offsets.</span>
                   </div>
                 </motion.div>
               )}
 
-              {/* RECOURSE VIEW */}
+              {/* Tab 2: Recourse */}
               {activeTab === "recourse" && (
                 <motion.div
                   key="recourse"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  exit={{ opacity: 0, y: -15 }}
                   className="h-full flex flex-col flex-1"
                 >
-                  <div className="mb-8">
-                    <h3 className="text-lg font-display font-bold text-white">Algorithmic Counterfactual Recourse</h3>
-                    <p className="text-xs text-slate-500 tracking-wide font-bold mt-0.5 uppercase">Minimal multidimensional vector delta to yield low-risk classification</p>
+                  <div className="mb-10">
+                    <h3 className="text-2xl font-display font-black text-white tracking-tight">Counterfactual Algorithmic Recourse</h3>
+                    <p className="text-xs text-slate-500 tracking-widest font-black mt-1 uppercase">Targeted vector adjustments required to invert classification state</p>
                   </div>
 
                   {recourseLoading ? (
-                    <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-brand-cyan" size={32}/></div>
+                    <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-brand-cyan w-10 h-10"/></div>
                   ) : recourse ? (
-                    <div className="flex-1 flex flex-col justify-center gap-8 py-4 relative z-10">
+                    <div className="flex-1 flex flex-col justify-center gap-10 py-4 relative z-10">
                       
-                      <div className="p-5 rounded-2xl border border-white/5 bg-black/30">
-                        <p className="text-sm leading-relaxed font-light text-slate-300 italic">&quot;{recourse.message}&quot;</p>
+                      <div className="p-6 rounded-2xl border border-white/5 bg-black/40 shadow-inner">
+                        <p className="text-base leading-relaxed font-medium text-slate-200 italic">&ldquo;{recourse.message}&rdquo;</p>
                       </div>
 
                       {recourse.changes.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {recourse.changes.map((ch: any, i: number) => (
-                            <div key={i} className="glass-panel p-5 rounded-xl relative overflow-hidden border border-brand-cyan/20">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-xs font-black tracking-widest uppercase text-brand-cyan">{ch.feature} Adjustment</span>
-                                <GitBranch size={14} className="text-brand-cyan opacity-50" />
+                            <div key={i} className="glass-panel p-6 rounded-2xl relative overflow-hidden border border-brand-cyan/30 bg-black/10 flex flex-col justify-between">
+                              <div className="flex items-center justify-between mb-4">
+                                <span className="text-xs font-black tracking-widest uppercase text-brand-cyan bg-brand-cyan/10 px-3 py-1.5 rounded-lg">{ch.feature} Optimal Node</span>
+                                <GitBranch size={18} className="text-brand-cyan opacity-70" />
                               </div>
-                              <div className="flex items-center justify-between text-center bg-black/20 rounded-lg p-4 border border-white/5 mt-4">
+                              <div className="flex items-center justify-between bg-black/35 rounded-xl p-5 border border-white/5">
                                 <div className="flex-1">
-                                  <div className="text-[9px] font-bold uppercase text-slate-500">Current</div>
-                                  <div className="text-xl font-black font-mono text-slate-400">{ch.original.toFixed(ch.original < 2 ? 2 : 0)}</div>
+                                  <div className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Current</div>
+                                  <div className="text-2xl font-black font-mono text-slate-400 mt-1">{ch.original.toFixed(ch.original < 2 ? 2 : 0)}</div>
                                 </div>
-                                <ChevronsRight className="text-brand-cyan shrink-0" size={18} />
-                                <div className="flex-1">
-                                  <div className="text-[9px] font-bold uppercase text-emerald-400">Target</div>
-                                  <div className="text-xl font-black font-mono text-emerald-400">{ch.target.toFixed(ch.target < 2 ? 2 : 0)}</div>
+                                <ChevronsRight className="text-brand-cyan shrink-0" size={24} />
+                                <div className="flex-1 pl-4 text-right">
+                                  <div className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Target</div>
+                                  <div className="text-3xl font-black font-mono text-brand-cyan mt-1 drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]">{ch.target.toFixed(ch.target < 2 ? 2 : 0)}</div>
                                 </div>
                               </div>
-                              <div className="text-[11px] text-slate-400 mt-4 text-center font-bold">Action: {ch.description}</div>
+                              <div className="text-xs text-slate-400 mt-4 font-bold text-center bg-white/5 py-2 rounded-lg">Task: {ch.description}</div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="h-40 flex items-center justify-center border border-dashed border-white/10 rounded-2xl text-slate-500 text-xs font-bold uppercase tracking-widest">
-                          Baseline holds nominal certification limits
+                        <div className="h-52 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl text-slate-500 gap-4 bg-black/10">
+                          <CheckCircle2 size={36} className="opacity-30" />
+                          <span className="text-sm uppercase font-black tracking-widest">Nominal Certification Restored</span>
                         </div>
                       )}
                       
@@ -272,63 +281,59 @@ export default function ExplainLab() {
                 </motion.div>
               )}
 
-              {/* PDP VIEW */}
+              {/* Tab 3: PDP */}
               {activeTab === "pdp" && (
                 <motion.div
                   key="pdp"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  exit={{ opacity: 0, y: -15 }}
                   className="h-full flex flex-col flex-1"
                 >
-                  <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
+                  <div className="flex flex-wrap justify-between items-center gap-6 mb-10">
                     <div>
-                      <h3 className="text-lg font-display font-bold text-white">Partial Dependence Topology</h3>
-                      <p className="text-xs text-slate-500 tracking-wide font-bold mt-0.5 uppercase">Non-linear joint probability distribution surface mesh</p>
+                      <h3 className="text-2xl font-display font-black text-white tracking-tight">Partial Dependence Topography</h3>
+                      <p className="text-xs text-slate-500 tracking-widest font-black mt-1 uppercase">Non-linear combined probability response grid</p>
                     </div>
                     
-                    {/* Feature Axes Selectors */}
                     <div className="flex items-center gap-3 z-20">
                       <select 
                         value={pdpX} 
                         onChange={(e) => setPdpX(e.target.value)} 
-                        className="bg-[#0f172a] text-slate-300 text-[11px] font-black uppercase border border-white/10 rounded px-3 py-1.5 focus:outline-none focus:border-brand-purple"
+                        className="bg-[#09090d] text-slate-300 text-xs font-black uppercase border border-white/10 rounded-xl px-4 py-2 focus:outline-none focus:border-brand-purple cursor-pointer shadow-md"
                       >
-                        {config.features.map((f: string) => <option key={f} value={f}>X: {f}</option>)}
+                        {config.features.map((f: string) => <option key={f} value={f}>Axis 1: {f}</option>)}
                       </select>
                       <select 
                         value={pdpY} 
                         onChange={(e) => setPdpY(e.target.value)}
-                        className="bg-[#0f172a] text-slate-300 text-[11px] font-black uppercase border border-white/10 rounded px-3 py-1.5 focus:outline-none focus:border-brand-purple"
+                        className="bg-[#09090d] text-slate-300 text-xs font-black uppercase border border-white/10 rounded-xl px-4 py-2 focus:outline-none focus:border-brand-purple cursor-pointer shadow-md"
                       >
-                        {config.features.map((f: string) => <option key={f} value={f}>Y: {f}</option>)}
+                        {config.features.map((f: string) => <option key={f} value={f}>Axis 2: {f}</option>)}
                       </select>
                     </div>
                   </div>
 
                   {pdpLoading ? (
-                    <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-brand-purple" size={32}/></div>
+                    <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-brand-purple w-10 h-10"/></div>
                   ) : pdpData ? (
                     <div className="flex-1 flex flex-col relative z-10">
-                      <div className="flex items-center justify-between text-[10px] text-slate-400 mb-3 font-bold">
-                        <span className="uppercase flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Minimal Risk</span>
-                        <span className="uppercase flex items-center gap-1.5">Critical Boundary <div className="w-2 h-2 rounded-full bg-red-500" /></span>
+                      <div className="flex items-center justify-between text-[11px] font-black text-slate-400 mb-4 tracking-wider uppercase bg-black/25 px-4 py-2.5 rounded-xl border border-white/5">
+                        <span className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-emerald-500" /> Certified Target Bounds</span>
+                        <span className="flex items-center gap-2">Critical Hyperplane <div className="w-3 h-3 rounded bg-red-500" /></span>
                       </div>
 
-                      {/* Dynamic 15x15 Matrix Heatmap rendered natively for raw tech feel */}
-                      <div className="w-full aspect-video max-h-[280px] border border-white/10 rounded-xl overflow-hidden bg-black grid grid-cols-15 border-collapse">
+                      <div className="w-full aspect-[2/1] max-h-[320px] border-2 border-white/10 rounded-2xl overflow-hidden bg-black grid grid-cols-15 shadow-2xl transition-all">
                         {pdpData.grid.map((cell: any, idx: number) => {
-                          // Maps risk (0 to 1) to HSL gradient from Emerald to Red
-                          // 140 deg (emerald) -> 0 deg (red)
-                          const hue = 140 - cell.risk * 140;
-                          const light = 25 + cell.risk * 20;
+                          const hue = 140 - cell.risk * 140; // 140(emerald) down to 0(red)
+                          const light = 20 + cell.risk * 25;
                           return (
                             <div 
                               key={idx}
-                              style={{ backgroundColor: `hsla(${hue}, 90%, ${light}%, ${0.1 + cell.risk * 0.8})` }}
-                              className="w-full h-full transition-all duration-300 border-[0.5px] border-black/20 hover:scale-110 hover:z-10 cursor-pointer group/cell relative"
+                              style={{ backgroundColor: `hsla(${hue}, 85%, ${light}%, ${0.15 + cell.risk * 0.8})` }}
+                              className="w-full h-full border-[0.5px] border-black/30 hover:scale-110 hover:z-20 cursor-pointer transition-all group/cell relative"
                             >
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-[9px] font-mono text-slate-200 px-2 py-1 rounded hidden group-hover/cell:block z-30 whitespace-nowrap pointer-events-none border border-slate-700">
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-950 text-[10px] font-mono text-slate-200 px-3 py-1.5 rounded-lg hidden group-hover/cell:block z-30 whitespace-nowrap border border-slate-700 pointer-events-none font-black uppercase tracking-wider shadow-2xl">
                                 P(Risk): {(cell.risk*100).toFixed(1)}%
                               </div>
                             </div>
@@ -336,10 +341,10 @@ export default function ExplainLab() {
                         })}
                       </div>
                       
-                      <div className="mt-6 text-center flex items-center justify-center gap-4 text-xs font-display font-bold text-slate-500">
-                        <span>Axis X: {config.feature_config[pdpX]?.label}</span>
-                        <ArrowRight size={12}/>
-                        <span>Axis Y: {config.feature_config[pdpY]?.label}</span>
+                      <div className="mt-8 flex items-center justify-center gap-5 text-sm font-display font-black text-slate-400 uppercase tracking-wider bg-white/5 py-3 rounded-xl border border-white/5">
+                        <span>Axis X: {config.feature_config[pdpX]?.label.split('(')[0]}</span>
+                        <ArrowRight size={16} className="text-brand-purple"/>
+                        <span>Axis Y: {config.feature_config[pdpY]?.label.split('(')[0]}</span>
                       </div>
                     </div>
                   ) : null}

@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import ClientProvider from "@/components/ClientProvider";
+import { Fingerprint } from "lucide-react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,13 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased relative selection:bg-brand-cyan/30 selection:text-white`}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased relative selection:bg-brand-cyan/30 selection:text-white bg-[#07070B]`}>
         
         {/* Top Gradient Navbar */}
         <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 glass-panel border-x-0 border-t-0 backdrop-blur-md">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl">🧠</span>
-            <span className="text-xl font-display font-bold bg-gradient-to-r from-white to-brand-cyan bg-clip-text text-transparent tracking-tight">
+          <div className="flex items-center space-x-3">
+            <Fingerprint className="text-brand-cyan w-7 h-7" />
+            <span className="text-xl font-display font-black bg-gradient-to-r from-white to-brand-cyan bg-clip-text text-transparent tracking-tight">
               AlzPredict AI
             </span>
           </div>
@@ -51,9 +52,11 @@ export default function RootLayout({
         </nav>
 
         <ClientProvider>
-          {/* Core Content Container */}
-          <main className="pt-16 min-h-screen relative overflow-hidden">
-            {children}
+          {/* Core Centered Content Container */}
+          <main className="pt-20 min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden">
+            <div className="w-full max-w-7xl px-4 md:px-8">
+              {children}
+            </div>
           </main>
         </ClientProvider>
         

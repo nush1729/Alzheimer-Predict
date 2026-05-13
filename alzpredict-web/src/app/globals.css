@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-cyan: #00F5FF;
-  --color-brand-blue: #0A84FF;
-  --color-brand-purple: #BF5AF2;
-  --color-brand-dark: #05050a;
+  --color-brand-cyan: #10B981; /* Emerald */
+  --color-brand-blue: #6366F1; /* Indigo */
+  --color-brand-purple: #8B5CF6; /* Violet */
+  --color-brand-dark: #07070A;
   
   --font-sans: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
@@ -23,8 +23,12 @@
 }
 
 :root {
-  --background: #030308;
+  --background: #07070B;
   --foreground: #f8fafc;
+}
+
+html {
+  font-size: 112.5%; /* Globally scales 1rem to 18px for bigger, highly-legible text */
 }
 
 * {
